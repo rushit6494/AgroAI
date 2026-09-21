@@ -12,3 +12,8 @@ models/*
 *.joblib
 .ipynb_checkpoints/
 .vscode/
+# Disease / pest image datasets (moti files)
+ml/disease_detection/dataset/*
+!ml/disease_detection/dataset/.gitkeep
+ml/pest_detection/dataset/*
+!ml/pest_detection/dataset/.gitkeep
