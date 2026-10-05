@@ -38,14 +38,15 @@ if uploaded is not None:
             st.subheader(f"Crop: {result['crop']}")
 
             if not result["confident"]:
-                st.warning(result["message"])
-            elif result["top_prediction"]["type"] == "healthy":
-                st.success(result["message"])
-            elif result["top_prediction"]["type"] == "unknown_cause":
-                st.info(result["message"])
-            else:
-                st.error(result["message"])
-
+    st.warning(result["message"])
+elif result["top_prediction"]["type"] == "healthy":
+    st.success(result["message"])
+elif result["top_prediction"]["type"] == "unknown_cause":
+    st.info(result["message"])
+elif result["top_prediction"]["type"] == "pest":
+    st.warning(f"🐛 {result['message']}")
+else:
+    st.error(result["message"])
             st.markdown("#### Severity")
             st.write(result["severity"])
 
@@ -53,14 +54,31 @@ if uploaded is not None:
             for p in result["predictions"]:
                 st.write(f"- **{p['label']}**: {p['confidence']:.0%}")
 
-            if result["confident"] and result["top_prediction"]["type"] not in ("healthy",):
-                st.markdown("#### Suggested Next Steps")
-                st.write(
-                    "- Inspect nearby plants for similar symptoms.\n"
-                    "- Monitor spread over the next few days.\n"
-                    "- Follow locally recommended crop-management practices.\n"
-                    "- Consult a local agricultural expert for confirmation before any treatment."
-                )
+            NEXT_STEPS = {
+    "disease": (
+        "- Inspect nearby plants for similar symptoms.\n"
+        "- Monitor disease spread over the next few days.\n"
+        "- Avoid working in the field when leaves are wet (reduces spread).\n"
+        "- Consult a local agricultural expert for confirmation before any treatment."
+    ),
+    "pest": (
+        "- Check undersides of leaves for insects (nymphs/adults).\n"
+        "- Inspect neighboring plants and field borders for insect vectors.\n"
+        "- Use yellow sticky traps to monitor pest population, if available.\n"
+        "- Consult a local agricultural expert before applying any pesticide."
+    ),
+    "physical_damage": (
+        "- Check recent spray history and nearby herbicide use.\n"
+        "- Avoid further chemical application until the cause is confirmed.\n"
+        "- Monitor whether new growth shows the same symptoms.\n"
+        "- Consult a local agricultural expert to confirm the cause."
+    ),
+}
+
+if result["confident"] and result["top_prediction"]["type"] in NEXT_STEPS:
+    icon = {"disease": "🦠", "pest": "🐛", "physical_damage": "⚠️"}[result["top_prediction"]["type"]]
+    st.markdown(f"#### {icon} Suggested Next Steps")
+    st.write(NEXT_STEPS[result["top_prediction"]["type"]])
 
             st.caption(
                 "This is an AI-generated analysis, not an official diagnosis. "
