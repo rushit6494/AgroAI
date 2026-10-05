@@ -21,3 +21,6 @@ python-dotenv
 # Images / Reports (later phases)
 Pillow
 reportlab
+
+# Deep Learning
+tensorflow

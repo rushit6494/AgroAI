@@ -1,0 +1,12 @@
+{
+  "classes": [
+    "bacterial_blight",
+    "curl_virus",
+    "healthy",
+    "herbicide_damage",
+    "leaf_hopper_jassids",
+    "leaf_reddening",
+    "leaf_variegation"
+  ],
+  "img_size": 224
+}
