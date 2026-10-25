@@ -9,5 +9,6 @@ pg = st.navigation([
     st.Page("app/pages/crop_recommendation.py", title="Crop Recommendation", icon="🌾"),
     st.Page("app/pages/plant_analysis.py", title="Plant Analysis", icon="📸"),
     st.Page("app/pages/soil_analysis.py", title="Soil Analysis", icon="🧪"),
+    st.Page("app/pages/weather.py", title="Weather", icon="🌦️"),
 ])
 pg.run()
