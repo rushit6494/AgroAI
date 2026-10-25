@@ -1,6 +1,7 @@
 import streamlit as st
 from ml.soil_analysis.rules import analyze_soil
 from app.services.history_service import save_record
+from app.services.report_service import generate_soil_report
 
 st.title("🧪 Soil Analysis")
 st.caption("Soil nutrient ane pH details bharo. Aa general guidance aape che, certified soil test no vikalp nathi.")
@@ -50,6 +51,17 @@ if "last_soil_result" in st.session_state:
             st.success("Saved to your farm history!")
     else:
         st.caption("ℹ️ Log in on the Dashboard page and select a farm to save this result.")
+
+    pdf_bytes = generate_soil_report(
+        farmer_name=st.session_state.get("user_name"),
+        farm_name=st.session_state.get("farm_name"),
+        soil_inputs=inputs,
+        soil_result=result,
+    )
+    st.download_button(
+        "📄 Download PDF Report", data=pdf_bytes,
+        file_name="AgroAI_Soil_Report.pdf", mime="application/pdf",
+    )
 
     st.caption(
         "⚠️ These thresholds are derived from general crop-recommendation data, "

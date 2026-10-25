@@ -7,6 +7,7 @@ from PIL import Image
 from ml.disease_detection.predict import predict_disease
 from app.services.treatment_service import get_treatment
 from app.services.history_service import save_record
+from app.services.report_service import generate_plant_report
 from config.settings import ALLOWED_IMAGE_TYPES, MAX_UPLOAD_MB
 
 st.title("📸 Plant Health Analysis")
@@ -134,6 +135,17 @@ if uploaded is not None:
                     st.success("Saved to your farm history!")
             else:
                 st.caption("ℹ️ Log in on the Dashboard page and select a farm to save this result.")
+
+            pdf_bytes = generate_plant_report(
+                farmer_name=st.session_state.get("user_name"),
+                farm_name=st.session_state.get("farm_name"),
+                result=result,
+            )
+            st.download_button(
+                "📄 Download PDF Report", data=pdf_bytes,
+                file_name=f"AgroAI_Plant_Report_{result['crop']}.pdf",
+                mime="application/pdf",
+            )
 
             st.caption(
                 "This is an AI-generated analysis, not an official diagnosis. "
