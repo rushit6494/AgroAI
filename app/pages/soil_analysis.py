@@ -1,5 +1,6 @@
 import streamlit as st
 from ml.soil_analysis.rules import analyze_soil
+from app.services.history_service import save_record
 
 st.title("🧪 Soil Analysis")
 st.caption("Soil nutrient ane pH details bharo. Aa general guidance aape che, certified soil test no vikalp nathi.")
@@ -18,6 +19,12 @@ with st.form("soil_form"):
 
 if submitted:
     result = analyze_soil(n, p, k, ph, moisture or None, soil_type or None)
+    st.session_state["last_soil_result"] = result
+    st.session_state["last_soil_inputs"] = {"n": n, "p": p, "k": k, "ph": ph}
+
+if "last_soil_result" in st.session_state:
+    result = st.session_state["last_soil_result"]
+    inputs = st.session_state["last_soil_inputs"]
 
     st.subheader("Nutrient Status")
     cols = st.columns(3)
@@ -30,6 +37,19 @@ if submitted:
 
     st.subheader("Summary")
     st.info(result["summary"])
+
+    if "farm_id" in st.session_state:
+        if st.button("💾 Save to History"):
+            save_record(
+                farm_id=st.session_state["farm_id"],
+                record_type="soil_analysis",
+                n_value=inputs["n"], p_value=inputs["p"],
+                k_value=inputs["k"], ph_value=inputs["ph"],
+                summary=result["summary"],
+            )
+            st.success("Saved to your farm history!")
+    else:
+        st.caption("ℹ️ Log in on the Dashboard page and select a farm to save this result.")
 
     st.caption(
         "⚠️ These thresholds are derived from general crop-recommendation data, "

@@ -6,6 +6,7 @@ from PIL import Image
 
 from ml.disease_detection.predict import predict_disease
 from app.services.treatment_service import get_treatment
+from app.services.history_service import save_record
 from config.settings import ALLOWED_IMAGE_TYPES, MAX_UPLOAD_MB
 
 st.title("📸 Plant Health Analysis")
@@ -60,6 +61,11 @@ if uploaded is not None:
                 image.save(tmp.name)
                 result = predict_disease(Path(tmp.name))
 
+        st.session_state["last_plant_result"] = result
+
+    if "last_plant_result" in st.session_state:
+        result = st.session_state["last_plant_result"]
+
         with col2:
             st.subheader(f"Crop: {result['crop']}")
 
@@ -113,6 +119,21 @@ if uploaded is not None:
                                     "Do NOT use this for actual application. Always follow the "
                                     "real product label and consult a certified agricultural expert."
                                 )
+
+            if "farm_id" in st.session_state:
+                if st.button("💾 Save to History"):
+                    save_record(
+                        farm_id=st.session_state["farm_id"],
+                        record_type="plant_analysis",
+                        crop=result["crop"],
+                        predicted_class=result["top_prediction"]["label"],
+                        confidence=round(result["top_prediction"]["confidence"] * 100, 2),
+                        severity=result["severity"],
+                        summary=result["message"],
+                    )
+                    st.success("Saved to your farm history!")
+            else:
+                st.caption("ℹ️ Log in on the Dashboard page and select a farm to save this result.")
 
             st.caption(
                 "This is an AI-generated analysis, not an official diagnosis. "
